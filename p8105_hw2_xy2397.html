@@ -162,6 +162,37 @@ $(document).ready(function () {
 </ul>
 <p>Then the dimension of dataset after cleaning “NYC_transit_data” is 1868 rows x 20 columns.</p>
 <p>These data is not tidy, since the data provided includes columns “route1” to “route11”, which list all routes served by a station entrance/exit, which is not a “tidy” format.</p>
+<p><strong>Answer the questions using the data</strong></p>
+<p>• How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St A/B/C/D; 125st 1; 125st 4/5); the distinct function may be useful here.</p>
+<pre class="r"><code>distinct_station = 
+  distinct(NYC_transit_data, line, station_name, .keep_all = TRUE)
+
+nrow(distinct_station)</code></pre>
+<pre><code>## [1] 465</code></pre>
+<p>• How many stations are ADA compliant?</p>
+<pre class="r"><code>ADA_compliant =  filter(distinct_station, ada == &quot;TRUE&quot;)
+
+nrow(ADA_compliant)</code></pre>
+<pre><code>## [1] 84</code></pre>
+<p>• What proportion of station entrances / exits without vending allow entrance?</p>
+<pre class="r"><code>no_vending = filter(distinct_station, vending == &quot;NO&quot;)
+
+nrow(no_vending)/nrow(distinct_station)</code></pre>
+<pre><code>## [1] 0.01935484</code></pre>
+<p>Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?</p>
+<pre class="r"><code>NYC_transit_data %&gt;% 
+  gather(key = &quot;route_number&quot;, value = &quot;route_name&quot;, route1:route11) %&gt;% 
+  distinct(station_name, .keep_all = TRUE) %&gt;% 
+  filter(route_name == &quot;A&quot;) %&gt;% 
+  nrow()</code></pre>
+<pre><code>## [1] 48</code></pre>
+<pre class="r"><code>NYC_transit_data %&gt;% 
+  gather(key = &quot;route_number&quot;, value = &quot;route_name&quot;, route1:route11) %&gt;% 
+  distinct(station_name, .keep_all = TRUE) %&gt;% 
+  filter(route_name == &quot;A&quot;) %&gt;% 
+  filter(ada == &quot;TRUE&quot;) %&gt;% 
+  nrow()</code></pre>
+<pre><code>## [1] 10</code></pre>
 </div>
 
 

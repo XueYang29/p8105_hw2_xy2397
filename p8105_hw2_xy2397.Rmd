@@ -42,4 +42,52 @@ Then the dimension of dataset after cleaning "NYC_transit_data" is `r nrow(NYC_t
 
 These data is not tidy, since the data provided includes columns "route1" to "route11", which list all routes served by a station entrance/exit, which is not a "tidy" format.
 
+**Answer the questions using the data**
+
+•	How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St A/B/C/D; 125st 1; 125st 4/5); the distinct function may be useful here.
+
+```{r}
+distinct_station = 
+  distinct(NYC_transit_data, line, station_name, .keep_all = TRUE)
+
+nrow(distinct_station)
+```
+
+
+•	How many stations are ADA compliant?
+
+```{r}
+ADA_compliant =  filter(distinct_station, ada == "TRUE")
+
+nrow(ADA_compliant)
+```
+
+
+•	What proportion of station entrances / exits without vending allow entrance?
+
+```{r}
+no_vending = filter(distinct_station, vending == "NO")
+
+nrow(no_vending)/nrow(distinct_station)
+```
+
+Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
+
+```{r}
+NYC_transit_data %>% 
+  gather(key = "route_number", value = "route_name", route1:route11) %>% 
+  distinct(station_name, .keep_all = TRUE) %>% 
+  filter(route_name == "A") %>% 
+  nrow()
+```
+
+```{r}
+NYC_transit_data %>% 
+  gather(key = "route_number", value = "route_name", route1:route11) %>% 
+  distinct(station_name, .keep_all = TRUE) %>% 
+  filter(route_name == "A") %>% 
+  filter(ada == "TRUE") %>% 
+  nrow()
+```
+
 
