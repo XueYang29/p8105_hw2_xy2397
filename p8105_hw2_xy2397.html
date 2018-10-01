@@ -134,7 +134,7 @@ $(document).ready(function () {
 <pre class="r"><code>NYC_transit_data = 
   read_csv(file = &quot;./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv&quot;) %&gt;% 
   janitor::clean_names() %&gt;% 
-  select(line:route11, entry, vending, entrance_type, ada, ada_notes) %&gt;%
+  select(line:route11, entry, vending, entrance_type, ada) %&gt;%
   mutate(entry = ifelse(entry == &quot;YES&quot;, TRUE, FALSE))</code></pre>
 <pre><code>## Parsed with column specification:
 ## cols(
@@ -160,7 +160,7 @@ $(document).ready(function () {
 <li><p>Select variables: only retain the following variables: line, station name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance.</p></li>
 <li><p>Covert variable: convert the entry variable from character (YES vs NO) to a logical variable (TRUE vs FALSE).</p></li>
 </ul>
-<p>Then the dimension of dataset after cleaning “NYC_transit_data” is 1868 rows x 20 columns.</p>
+<p>Then the dimension of dataset after cleaning “NYC_transit_data” is 1868 rows x 19 columns.</p>
 <p>These data is not tidy, since the data provided includes columns “route1” to “route11”, which list all routes served by a station entrance/exit, which is not a “tidy” format.</p>
 <p><strong>Answer the questions using the data</strong></p>
 <p>• How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St A/B/C/D; 125st 1; 125st 4/5); the distinct function may be useful here.</p>
@@ -193,6 +193,57 @@ nrow(no_vending)/nrow(distinct_station)</code></pre>
   filter(ada == &quot;TRUE&quot;) %&gt;% 
   nrow()</code></pre>
 <pre><code>## [1] 10</code></pre>
+</div>
+<div id="problem-2" class="section level1">
+<h1>Problem 2</h1>
+<p><strong>Read and clean the Mr. Trash Wheel sheet</strong></p>
+<p>• specify the sheet in the Excel file and to omit columns containing notes (using the range argument and cell_cols()function) • use reasonable variable names • omit rows that do not include dumpster-specific data • rounds the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)</p>
+<pre class="r"><code>Mr.Trash_Wheel_data = 
+  readxl::read_excel(path = &quot;./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;,
+                     sheet = &quot;Mr. Trash Wheel&quot;,
+                     range = cellranger::cell_cols(c(&quot;A:N&quot;))) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(!is.na(dumpster)) %&gt;% 
+  mutate(., sports_balls = as.integer(sports_balls)) </code></pre>
+<p><strong>Read and clean precipitation data for 2016 and 2017</strong></p>
+<p>For each, omit rows without precipitation data and add a variable year. Next, combine datasets and convert month to a character variable (the variable month.name is built into R and should be useful).</p>
+<pre class="r"><code>precipitation_2016_data = 
+  readxl::read_excel(path = &quot;./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;,
+                     sheet = &quot;2016 Precipitation&quot;,
+                     range = &quot;A2:B15&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(!is.na(month)) %&gt;% 
+  mutate(year = &quot;2016&quot;)</code></pre>
+<pre class="r"><code>precipitation_2017_data = 
+  readxl::read_excel(path = &quot;./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx&quot;,
+                     sheet = &quot;2017 Precipitation&quot;,
+                     range = &quot;A2:B15&quot;) %&gt;% 
+  janitor::clean_names() %&gt;% 
+  filter(!is.na(month)) %&gt;% 
+  mutate(year = &quot;2017&quot;) </code></pre>
+<pre class="r"><code>precipitation_data = 
+  bind_rows(precipitation_2016_data, precipitation_2017_data) %&gt;% 
+  mutate(., month = month.name[month])
+precipitation_data </code></pre>
+<pre><code>## # A tibble: 24 x 3
+##    month     total year 
+##    &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;
+##  1 January    3.23 2016 
+##  2 February   5.32 2016 
+##  3 March      2.24 2016 
+##  4 April      1.78 2016 
+##  5 May        5.19 2016 
+##  6 June       3.2  2016 
+##  7 July       6.09 2016 
+##  8 August     3.96 2016 
+##  9 September  4.53 2016 
+## 10 October    0.62 2016 
+## # ... with 14 more rows</code></pre>
+<p><strong>A paragraph about these data</strong></p>
+<p>you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2017? What was the median number of sports balls in a dumpster in 2016?</p>
+<p>From the Mr. Trash Wheel sheet, there are 215 observations of dumpsters. The dataset contains variables including month, year, data, weight(tons), volume (cubic yards), plastic bottles, polystyrene, cigarette butts, glass Bottles, grocery bags, chip bags, sports balls and homes powered.</p>
+<p>From the 2016 and 2017 precipitation sheets, there are 12 and 8 observations respectively. The datasets contains variables including month and monthly total precipitation.</p>
+<p>For available data, the total precipitiation in 2017 is 29.93, the median number of sports balls in a dumpster in 2016 is 26</p>
 </div>
 
 

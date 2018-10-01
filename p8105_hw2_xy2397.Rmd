@@ -20,7 +20,7 @@ library(tidyverse)
 NYC_transit_data = 
   read_csv(file = "./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>% 
   janitor::clean_names() %>% 
-  select(line:route11, entry, vending, entrance_type, ada, ada_notes) %>%
+  select(line:route11, entry, vending, entrance_type, ada) %>%
   mutate(entry = ifelse(entry == "YES", TRUE, FALSE))
 ```
 
@@ -89,5 +89,68 @@ NYC_transit_data %>%
   filter(ada == "TRUE") %>% 
   nrow()
 ```
+
+# Problem 2
+
+**Read and clean the Mr. Trash Wheel sheet**
+
+•	specify the sheet in the Excel file and to omit columns containing notes (using the range argument and cell_cols()function)
+•	use reasonable variable names
+•	omit rows that do not include dumpster-specific data
+•	rounds the number of sports balls to the nearest integer and converts the result to an integer variable (using as.integer)
+
+```{r}
+Mr.Trash_Wheel_data = 
+  readxl::read_excel(path = "./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx",
+                     sheet = "Mr. Trash Wheel",
+                     range = cellranger::cell_cols(c("A:N"))) %>% 
+  janitor::clean_names() %>% 
+  filter(!is.na(dumpster)) %>% 
+  mutate(., sports_balls = as.integer(sports_balls)) 
+```
+
+
+**Read and clean precipitation data for 2016 and 2017**
+
+For each, omit rows without precipitation data and add a variable year. Next, combine datasets and convert month to a character variable (the variable month.name is built into R and should be useful).
+
+```{r}
+precipitation_2016_data = 
+  readxl::read_excel(path = "./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx",
+                     sheet = "2016 Precipitation",
+                     range = "A2:B15") %>% 
+  janitor::clean_names() %>% 
+  filter(!is.na(month)) %>% 
+  mutate(year = "2016")
+
+```
+
+```{r}
+precipitation_2017_data = 
+  readxl::read_excel(path = "./data/HealthyHarborWaterWheelTotals2017-9-26.xlsx",
+                     sheet = "2017 Precipitation",
+                     range = "A2:B15") %>% 
+  janitor::clean_names() %>% 
+  filter(!is.na(month)) %>% 
+  mutate(year = "2017") 
+```
+
+```{r}
+precipitation_data = 
+  bind_rows(precipitation_2016_data, precipitation_2017_data) %>% 
+  mutate(., month = month.name[month])
+precipitation_data 
+```
+
+
+**A paragraph about these data**
+
+you are encouraged to use inline R. Be sure to note the number of observations in both resulting datasets, and give examples of key variables. For available data, what was the total precipitation in 2017? What was the median number of sports balls in a dumpster in 2016?
+
+From the Mr. Trash Wheel sheet, there are 215 observations of dumpsters. The dataset contains variables including month, year, data, weight(tons), volume (cubic yards), plastic bottles, polystyrene,	cigarette butts, glass Bottles, grocery bags, chip bags, sports balls and homes powered. 
+
+From the 2016 and 2017 precipitation sheets, there are 12 and 8 observations respectively. The datasets contains variables including month and monthly total precipitation.
+
+For available data, the total precipitiation in 2017 is `r (sum(filter(precipitation_2017_data, !is.na(total))$total))`, the median number of sports balls in a dumpster in 2016 is `r (median(filter(Mr.Trash_Wheel_data, year == "2016")$sports_balls))`
 
 
