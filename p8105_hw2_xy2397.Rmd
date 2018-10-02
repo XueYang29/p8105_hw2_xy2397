@@ -9,10 +9,16 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
 
 library(tidyverse)
+library(ggridges)
 ```
+
 
 
 # Problem 1
@@ -220,28 +226,26 @@ ggplot(brfss_2002, aes(x = excellent)) +
     x = "response value",
     y = "frequence",
     caption = "Data from the p8105.datasets package"
-  )
+  ) 
 ```
 
 •	Make a scatterplot showing the proportion of “Excellent” response values in New York County and Queens County (both in NY State) in each year from 2002 to 2010.
 
 ```{r}
-brfss_NY = 
-  brfss %>% 
+brfss %>% 
   filter(locationdesc %in% c("NY - New York County", "NY - Queens County")) %>% 
-  mutate(excellent_prop = (excellent)/(excellent + very_good + good + fair + poor)) 
-
-ggplot(brfss_NY, aes(x = year, y = excellent_prop , color = locationdesc )) +
-  geom_point() +
+  mutate(excellent_prop = (excellent)/(excellent + very_good + good + fair + poor))  %>% 
+  ggplot(aes(x = year, y = excellent_prop , color = locationdesc )) +
+  geom_point(alpha = 0.5) +
   labs(
     title = "Proportion of Excellent response values from 2002 to 2010",
     x = "Year",
     y = "Proportion of excellent response values ",
     caption = "Data from the p8105.datasets package"
   ) +
-  
+scale_color_hue(
+    name = "Location",
+  ) +
   theme(legend.position = "bottom")
-
- 
 ```
 
