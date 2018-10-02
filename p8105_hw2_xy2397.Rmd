@@ -181,8 +181,67 @@ brfss =
   select(., -class, -topic, -question, -sample_size, -(confidence_limit_low:geo_location)) %>%
   spread(key = "response", value = "data_value") %>% 
   janitor::clean_names() %>% 
-  mutate(proportion = (excellent + very_good)/(excellent + very_good + good + fair + poor))
-
+  mutate(excellent_verygood_proportion = (excellent + very_good)/(excellent + very_good + good + fair + poor)) 
 ```
 
+Using this dataset, do or answer the following:
+
+•	How many unique locations are included in the dataset? Is every state represented? What state is observed the most?
+
+```{r}
+length(unique(brfss$locationdesc))
+length(unique(brfss$locationabbr))
+```
+
+
+There are 404 unique location included in the dataset, and every state represented, since there is totally 51 states in the US, and the unique states included in the dataset is exactly 51.
+
+```{r}
+table(brfss$locationabbr)
+max(table(brfss$locationabbr))
+```
+
+NJ is observed the most.
+
+•	In 2002, what is the median of the “Excellent” response value?
+
+```{r}
+brfss_2002 = filter(brfss, year == "2002", !is.na(excellent))
+
+median(brfss_2002$excellent)
+```
+
+•	Make a histogram of “Excellent” response values in the year 2002.
+```{r}
+ggplot(brfss_2002, aes(x = excellent)) +
+  geom_histogram() +
+  labs(
+    title = "Excellent response values in 2002",
+    x = "response value",
+    y = "frequence",
+    caption = "Data from the p8105.datasets package"
+  )
+```
+
+•	Make a scatterplot showing the proportion of “Excellent” response values in New York County and Queens County (both in NY State) in each year from 2002 to 2010.
+
+```{r}
+brfss_NY = 
+  brfss %>% 
+  filter(locationdesc %in% c("NY - New York County", "NY - Queens County")) %>% 
+  mutate(excellent_prop = (excellent)/(excellent + very_good + good + fair + poor)) 
+
+ggplot(brfss_NY, aes(x = year, y = excellent_prop , color = locationdesc )) +
+  geom_point() +
+  labs(
+    title = "Proportion of Excellent response values from 2002 to 2010",
+    x = "Year",
+    y = "Proportion of excellent response values ",
+    caption = "Data from the p8105.datasets package"
+  ) +
+  
+  theme(legend.position = "bottom")
+
+ 
+```
 
