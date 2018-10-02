@@ -2,7 +2,10 @@
 title: "p8105_hw2_xy2397"
 author: "Xue Yang"
 date: "9/27/2018"
-output: github_document
+output:
+    github_document:
+    toc: true
+    toc_float: true
 ---
 
 ```{r setup, include=FALSE}
