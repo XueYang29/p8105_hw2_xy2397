@@ -2,7 +2,7 @@
 title: "p8105_hw2_xy2397"
 author: "Xue Yang"
 date: "9/27/2018"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
