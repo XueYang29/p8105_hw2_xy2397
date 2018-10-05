@@ -25,18 +25,19 @@ library(ggridges)
 
 **Read and clean the data**
 
-Read and clean the data; retain line, station name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance. Convert the entry variable from character (YES vs NO) to a logical variable (the ifelse or recode function may be useful).
-
 ```{r import_and_maniqulate_data}
-# read the csv file through a relative path
-# clean up variable names
-# select variables following the requirement
-# convert the variables from character to logical
 
 NYC_transit_data = 
+  # read the csv file through a relative path
   read_csv(file = "./data/NYC_Transit_Subway_Entrance_And_Exit_Data.csv") %>%
+  
+  # clean up variable names
   janitor::clean_names() %>% 
+  
+  # select variables following the requirement
   select(line:route11, entry, vending, entrance_type, ada) %>%
+  
+  # convert the variables from character to logical
   mutate(entry = ifelse(entry == "YES", TRUE, FALSE))
 
 
@@ -44,9 +45,7 @@ NYC_transit_data =
 
 **Short paragraph about the dataset**
 
-Write a short paragraph about this dataset – explain briefly what variables the dataset contains, describe your data cleaning steps so far, and give the dimension (rows x columns) of the resulting dataset. Are these data tidy?
-
-This dataset "NYC_Transit_Subway_Entrance_And_Exit_Data" (the original dataset before cleaning) contains variables: division, line, station name, station latitude, station longitude, station location (station latitude, station longitude), routes served from 1 to 11, entrance Type (stair, door, elevator, escalator or easement), entry (yes or no), entrance latitude, entrance longitude, entrance location (entrance latitude, entrance longitude), exit only (whether or not), vending (yes or no), staffing (full, none or part), staff hours, ADA (ADA compliant or not), ADA notes, free crossover (true or false), North South Street, East West Street, corner(NW, NE, SW or SE).
+This dataset "NYC_Transit_Subway_Entrance_And_Exit_Data" (the original dataset before cleaning) which contains information related to each entrance and exit for each subway station in NYC, contains variables: division, line, station name, station latitude, station longitude, station location (station latitude, station longitude), routes served from 1 to 11, entrance Type (stair, door, elevator, escalator or easement), entry (yes or no), entrance latitude, entrance longitude, entrance location (entrance latitude, entrance longitude), exit only (whether or not), vending (yes or no), staffing (full, none or part), staff hours, ADA (ADA compliant or not), ADA notes, free crossover (true or false), North South Street, East West Street, corner(NW, NE, SW or SE). And we are interested in the major variables such as line, station name, station latitude / longitude, routes served, entry, vending, entrance type, and ADA compliance.
 
 I clean the data and rename the data "NYC_transit_data" from the following step:
 
@@ -64,7 +63,7 @@ These data is not tidy, since the data provided includes columns "route1" to "ro
 
 **Answer the questions using the data**
 
-•	How many distinct stations are there? Note that stations are identified both by name and by line (e.g. 125th St A/B/C/D; 125st 1; 125st 4/5); the distinct function may be useful here.
+•	How many distinct stations are there? 
 
 ```{r}
 # filter the data by distinct stations
@@ -87,6 +86,7 @@ ADA_compliant =  filter(distinct_station, ada == "TRUE")
 nrow(ADA_compliant)
 ```
 
+So there are 84 ADA compliants in distinct stations.
 
 •	What proportion of station entrances / exits without vending allow entrance?
 
@@ -103,34 +103,51 @@ allow_entrance = filter(no_vending, entry == "TRUE")
 nrow(allow_entrance)/nrow(no_vending)
 ```
 
-Reformat data so that route number and route name are distinct variables. How many distinct stations serve the A train? Of the stations that serve the A train, how many are ADA compliant?
+So the proportion of station entrances / exits without vending allow entrance is 0.377.
+
+**Reformat data and answer questions**
+
+•	How many distinct stations serve the A train? 
 
 ```{r}
-# reformat data to distinct the route number and route name variables 
-# distinct the stations by line and name
-# filter the distinct stations that serve A train
-# calculate the number of distinct stations that serve A train
 
 NYC_transit_data %>% 
+  
+  # reformat data to distinct the route number and route name variables 
   gather(key = "route_number", value = "route_name", route1:route11) %>%
+  
+  # distinct the stations by line and name
   distinct(line, station_name, .keep_all = TRUE) %>% 
+  
+  # filter the distinct stations that serve A train
   filter(route_name == "A") %>%
+  
+  # calculate the number of distinct stations that serve A train
   nrow()
+
 ```
 So there are 60 distinct stations serve the A train.
 
+•	Of the stations that serve the A train, how many are ADA compliant?
 ```{r}
-# reformat data to distinct the route number and route name variables 
-# distinct the stations by line and name
-# filter the distinct stations that serve A train
-# calculate the number of distinct stations that serve A train that are ADA complaint
 
 NYC_transit_data %>% 
+  
+  # reformat data to distinct the route number and route name variables 
   gather(key = "route_number", value = "route_name", route1:route11) %>%
+  
+  # distinct the stations by line and name
   distinct(line, station_name, .keep_all = TRUE) %>% 
+  
+  # filter the distinct stations that serve A train
   filter(route_name == "A") %>% 
+  
+  # filter the distinct stations that serve A train that are ADA complaint
   filter(ada == "TRUE") %>% 
+  
+  # calculate the number of distinct stations that serve A train that are ADA complaint
   nrow()
+
 ```
 So of the stations that serve the A train, 17 of them are ADA compliant.
 
